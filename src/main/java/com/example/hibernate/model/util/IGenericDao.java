@@ -63,11 +63,5 @@ public interface IGenericDao<E, PK extends Serializable> {
      */
     public E update(E entity);
 
-    /**
-     * 
-     * @param <R> Tipo de Retorno de operacion
-     * @param operacion operación que implementa la interfaz OperacionHibernate<R>
-     * @return Devuelve un objeto de tipo R genérico
-     */
-    public <R> R executarDentroTransaccion(OperacionHibernate<R> operacion);
+   
 }

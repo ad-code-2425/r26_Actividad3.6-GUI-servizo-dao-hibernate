@@ -6,10 +6,8 @@ import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 
 import com.example.hibernate.model.util.exceptions.InstanceNotFoundException;
-import com.example.hibernate.util.HibernateUtil;
 
 /**
  * Implementación xenérica do DAO en Hibernate.
@@ -22,7 +20,7 @@ public class GenericDaoHibernate<E, PK extends Serializable> implements IGeneric
     private final SessionFactory sessionFactory;
 
     @SuppressWarnings("unchecked")
-    public GenericDaoHibernate() {
+    public GenericDaoHibernate(SessionFactory sessionFactory) {
         // getClass(): accedemos a la clase de la instancia que extienda esta clase
         // (será ProfesorDaoHibernate u XDaoHibernate)
         // .getGenericSuperclass(): obtenemos el tipo de la clase madre directa:
@@ -36,41 +34,14 @@ public class GenericDaoHibernate<E, PK extends Serializable> implements IGeneric
         this.entityClass = (Class<E>) ((ParameterizedType) getClass().getGenericSuperclass())
                 .getActualTypeArguments()[0];
 
-        this.sessionFactory = HibernateUtil.getInstance().getSessionFactory();
+        this.sessionFactory = sessionFactory;
     }
 
     protected Session getSession() {
         return sessionFactory.getCurrentSession();
     }
 
-    /**
-     * 
-     * @param <R>       Tipo de retorno da operación.
-     * @param operacion Función que recibe a sesión e devolve un resultado.
-     *                  Personalizouse para poder lanzar unha Exception
-     * @return O resultado da operación.
-     * 
-     */
-
-    public <R> R executarDentroTransaccion(OperacionHibernate<R> operacion) {
-        Transaction tx = null;
-        R resultado = null;
-        try {
-            Session session = getSession();
-            tx = session.beginTransaction();
-            resultado = operacion.executar();
-            tx.commit();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            if (tx != null) {
-                tx.rollback();
-            }
-            throw new RuntimeException("Erro ao executar a operación en Hibernate", ex); // Convértese en unchecked
-                                                                                         // exception
-        }
-        return resultado;
-    }
-
+    
     @Override
     public void create(E entity) {
         Session session = getSession();

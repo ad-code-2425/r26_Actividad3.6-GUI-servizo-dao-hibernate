@@ -22,10 +22,15 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.hibernate.SessionFactory;
+
 import com.example.hibernate.model.Profesor;
+import com.example.hibernate.model.dao.ProfesorDaoHibernate;
 import com.example.hibernate.model.servicio.IProfesorServicio;
 import com.example.hibernate.model.servicio.ProfesorServicio;
+import com.example.hibernate.model.util.TransactionManager;
 import com.example.hibernate.model.util.exceptions.InstanceNotFoundException;
+import com.example.hibernate.util.HibernateUtil;
 
 
 
@@ -42,6 +47,9 @@ public class ProfesorWindow extends JFrame {
 	private JList<Profesor> JLIstAllProfesors;
 
 	private IProfesorServicio profesorServicio;
+	private TransactionManager transactionManager;
+	private SessionFactory sessionFactory;
+	
 	private CreateNewProfeDialog createDialog;
 	private JButton btnModificarProfe;
 	private JButton btnEliminarProfe;
@@ -66,8 +74,10 @@ public class ProfesorWindow extends JFrame {
 	 * Create the frame.
 	 */
 	public ProfesorWindow() {
+		this.sessionFactory = HibernateUtil.getInstance().getSessionFactory();
+		this.transactionManager = new TransactionManager(sessionFactory);
 
-		profesorServicio = new ProfesorServicio();
+		profesorServicio = new ProfesorServicio(transactionManager, new ProfesorDaoHibernate(sessionFactory));
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 847, 772);

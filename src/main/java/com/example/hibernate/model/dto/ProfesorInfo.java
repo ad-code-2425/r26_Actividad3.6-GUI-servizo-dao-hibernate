@@ -1,4 +1,4 @@
-package com.example.hibernate.util;
+package com.example.hibernate.model.dto;
 
 import java.io.Serializable;
 
